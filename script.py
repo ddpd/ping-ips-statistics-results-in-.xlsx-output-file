@@ -9,8 +9,8 @@ from openpyxl.styles import Font, PatternFill
 
 SERVERS_DIR = 'servers'
 RESULTS_DIR = 'ping_results'
-PING_COUNT = 20
-TIMEOUT_SEC = 4
+PING_COUNT = 40
+TIMEOUT_MS = 400
 MAX_THREADS = 8
 DEBUG = True
 
@@ -25,11 +25,13 @@ def debug_print(message):
 def execute_ping(host):
     param = '-n' if platform.system().lower() == 'windows' else '-c'
     command = ['ping', param, str(PING_COUNT)]
-    
+
+    ###########################################################################################
     if platform.system().lower() == 'windows':
-        command.extend(['-w', str(TIMEOUT_SEC * 1000)])
+        command.extend(['-w', str(TIMEOUT_MS)])  # Windows uses ms by default
     else:
-        command.extend(['-W', str(TIMEOUT_SEC)])
+        command.extend(['-W', str(TIMEOUT_MS / 1000)])  # Convert ms to seconds for Unix
+    ###########################################################################################
     
     command.append(host)
     return subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
